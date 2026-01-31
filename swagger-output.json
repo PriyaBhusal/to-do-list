@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Todo Application",
+    "description": "This is a Todo application with JWT authentication",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": { "example": "9876543210" },
+                  "password": { "example": "password123" },
+                  "fullName": { "example": "John Doe" },
+                  "email": { "example": "john@example.com" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created successfully" },
+          "401": { "description": "Phone already exists" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": { "example": "9876543210" },
+                  "password": { "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful, returns JWT token" },
+          "404": { "description": "Invalid credentials" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/user/{id}": {
+      "patch": {
+        "summary": "Update user details",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": { "example": "John Doe" },
+                  "email": { "example": "john@example.com" },
+                  "password": { "example": "newpassword123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User updated successfully" },
+          "401": { "description": "Unauthorized – Invalid or expired token" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User deleted successfully" },
+          "401": { "description": "Unauthorized – Invalid or expired token" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/todo": {
+      "post": {
+        "summary": "Add a new Todo",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "example": "My Todo" },
+                  "description": { "example": "Todo description" },
+                  "actionData": { "example": "Some data" },
+                  "banner": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Todo created successfully" },
+          "401": { "description": "Unauthorized – Invalid or expired token" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "get": {
+        "summary": "Get all Todos",
+        "responses": {
+          "200": { "description": "Todos fetched successfully" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/todo/{id}": {
+      "get": {
+        "summary": "Get a Todo by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Todo fetched successfully" },
+          "404": { "description": "Todo not found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "patch": {
+        "summary": "Update a Todo",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "example": "Updated Todo" },
+                  "description": { "example": "Updated description" },
+                  "actionData": { "example": "Updated data" },
+                  "banner": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Todo updated successfully" },
+          "401": { "description": "Unauthorized – Invalid or expired token" },
+          "404": { "description": "Todo not found or not authorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Todo",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Todo deleted successfully" },
+          "401": { "description": "Unauthorized – Invalid or expired token" },
+          "404": { "description": "Todo not found or not authorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    }
+  }
+}
